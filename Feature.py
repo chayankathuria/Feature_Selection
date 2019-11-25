@@ -137,5 +137,41 @@ From the above correlation matrix we see that there are no highly correlated fea
 And even exploring correlation to target shows feature 33 with the highest correlation of only 0.37.
 '''
 
+# 4. Univariate Feature Selection
+
+'''
+We can use sklearn's SelectKBest to select a number of top features to keep. 
+This method uses statistical tests like the chi-square test to select features having the highest correlation to the target. 
+Here we will keep the top 100 features.
+'''
+
+# feature extraction
+k_best = feature_selection.SelectKBest(score_func=feature_selection.f_classif, k=100)
+# fit on train set
+fit = k_best.fit(X_train, y_train)
+# transform train set
+univariate_features = fit.transform(X_train)
+
+univariate_features.shape # (250,100)
+
+# Let's run the crossvalidation again to see the variance in scores
+
+lr = LogisticRegression(solver='liblinear')
+rfc = RandomForestClassifier(n_estimators=100)
+
+lr_scores = cross_val_score(lr, univariate_features, y_train, cv=5, scoring='roc_auc')
+rfc_scores = cross_val_score(rfc, univariate_features, y_train, cv=5, scoring='roc_auc')
+
+print('LR Scores: ', lr_scores)
+print('RFC Scores: ', rfc_scores)
+
+'''
+Output->
+LR Scores:  [0.89930556 0.93402778 0.89236111 0.96006944 0.94791667]
+RFC Scores:  [0.78125    0.81336806 0.78038194 0.86545139 0.77690972]
+
+As visible, the variance is still high. As a low variance model like Logistic regression is varying almost by 6%.
+'''
+
 
 
