@@ -83,3 +83,59 @@ RFC Scores:RFC:[0.59722222 0.6171875  0.66232639 0.75086806 0.69444444]
 We can see the model is overfitting from the variation in cross validation scores. 
 We can attempt to improve these scores through feature selection.
 '''
+# 1. Remove features with missing values
+'''
+check for missing values and then can remove columns exceeding a threshold we define.
+'''
+# Checking for missing values; Will give true if even a single value in the whole df is missing. 
+isnull().any().any()
+'''
+Output-> False
+Hence no missing values
+'''
+
+# 2.  Remove features with low variance
+
+'''
+In sklearn's feature selection module we find VarianceThreshold.  It removes all features whose variance doesn't meet some threshold.  
+By default it removes features with zero variance or features that have the same value for all samples.
+'''
+from sklearn import feature_selection
+
+sel = feature_selection.VarianceThreshold()
+train_variance = sel.fit_transform(train)
+train_variance.shape
+
+'''
+We can see from above there are no features with the same value in all columns, so we have no features to remove here.  
+We can revisit this technique later and consider removing features with low variance by changing the variance later.
+'''
+
+# 3. Remove highly correlated features
+'''
+Features that are highly correlated or colinear can cause overfitting.  Here we will explore correlations among features.
+'''
+
+# find correlations to target
+corr_matrix = train.corr().abs()
+
+print(corr_matrix['target'].sort_values(ascending=False).head(10))
+
+# Select upper triangle of correlation matrix
+matrix = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool))
+sns.heatmap(matrix)
+plt.show;
+
+# Find index of feature columns with high correlation
+to_drop = [column for column in matrix.columns if any(matrix[column] > 0.50)]
+print('Columns to drop: ' , (len(to_drop)))
+
+'''
+Output-> Columns to drop:  0
+
+From the above correlation matrix we see that there are no highly correlated features in the dataset. 
+And even exploring correlation to target shows feature 33 with the highest correlation of only 0.37.
+'''
+
+
+
