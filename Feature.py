@@ -244,3 +244,15 @@ RFC Scores:  [0.86024306 0.82725694 0.75434028 0.88541667 0.80642361]
 As can be seen, Logistic regression is still giving great results. But this time, the performance of rf also bumped up significantly.
 '''
 
+# 7. PCA
+
+'''
+PCA is not a feature selection/removal technique, but a feature extraction technique which uses all the features 
+available and transform them into a lower dimensional space. This results in dimensionality reduction. The PCA Components now formed
+are a set of totally new features formed from original features. Now, we can select top few components which explain most of the variance
+in data. Hence we extracted features and reduced dimensionality.
+'''
+
+
+
+
