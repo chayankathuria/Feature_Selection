@@ -170,8 +170,77 @@ Output->
 LR Scores:  [0.89930556 0.93402778 0.89236111 0.96006944 0.94791667]
 RFC Scores:  [0.78125    0.81336806 0.78038194 0.86545139 0.77690972]
 
+Cross validation scores are improved as compared to the baseline above, 
+but we still can see variation in the scores which indicates overfitting.
 As visible, the variance is still high. As a low variance model like Logistic regression is varying almost by 6%.
 '''
 
+# 5. Recursive Feature Elimination
 
+'''
+Recursive feature selection works by eliminating the least important features. 
+It continues recursively until the specified number of features is reached. 
+Recursive elimination can be used with any model that assigns weights to features, either through coef_ or feature_importances_
+
+Here we will use logistic regression to select the 100 best features.
+'''
+
+# feature extraction
+rfe = feature_selection.RFE(lr, n_features_to_select=100)
+
+# fit on train set
+fit = rfe.fit(X_train, y_train)
+
+# transform train set
+recursive_features = fit.transform(X_train)
+
+lr = LogisticRegression(solver='liblinear')
+rfc = RandomForestClassifier(n_estimators=10)
+
+lr_scores = cross_val_score(lr, recursive_features, y_train, cv=5, scoring='roc_auc')
+rfc_scores = cross_val_score(rfc, recursive_features, y_train, cv=5, scoring='roc_auc')
+
+print('LR Scores: ', lr_scores)
+print('RFC Scores: ', rfc_scores)
+
+'''
+Output->
+LR Scores:  [0.99826389 0.99652778 0.984375   1.         0.99652778]
+RFC Scores:  [0.71267361 0.66753472 0.71614583 0.55729167 0.60503472]
+
+As evident, the logistic regression now is sufficiently robust and high performing. Let's check out other methods too.
+'''
+
+# 6. Feature selection using SelectFromModel
+
+'''
+Like recursive feature selection, sklearn's SelectFromModel is used with any estimator that has a coef_ or feature_importances_ attribute. 
+It removes features with values below a set threshold
+'''
+
+# feature extraction
+select_model = feature_selection.SelectFromModel(lr)
+
+# fit on train set
+fit = select_model.fit(X_train, y_train)
+
+# transform train set
+model_features = fit.transform(X_train)
+
+lr = LogisticRegression(solver='liblinear')
+rfc = RandomForestClassifier(n_estimators=100)
+
+lr_scores = cross_val_score(lr, model_features, y_train, cv=5, scoring='roc_auc')
+rfc_scores = cross_val_score(rfc, model_features, y_train, cv=5, scoring='roc_auc')
+
+print('LR Scores: ', lr_scores)
+print('RFC Scores: ', rfc_scores)
+
+'''
+Output-> 
+LR Scores:  [0.984375   0.99479167 0.97222222 0.99305556 0.99305556]
+RFC Scores:  [0.86024306 0.82725694 0.75434028 0.88541667 0.80642361]
+
+As can be seen, Logistic regression is still giving great results. But this time, the performance of rf also bumped up significantly.
+'''
 
