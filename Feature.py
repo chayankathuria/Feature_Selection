@@ -253,6 +253,30 @@ are a set of totally new features formed from original features. Now, we can sel
 in data. Hence we extracted features and reduced dimensionality.
 '''
 
+from sklearn.decomposition import PCA
+# pca - keep 90% of variance
+pca = PCA(0.90)
 
+principal_components = pca.fit_transform(X_train)
+principal_df = pd.DataFrame(data = principal_components)
+principal_df.shape
 
+'''
+(250,139)
+We can see that we are left with 139 features that explain 90% of the variance in our data
+'''
+
+lr = LogisticRegression(solver='liblinear')
+rfc = RandomForestClassifier(n_estimators=100)
+
+lr_scores = cross_val_score(lr, principal_df, y_train, cv=5, scoring='roc_auc')
+rfc_scores = cross_val_score(rfc, principal_df, y_train, cv=5, scoring='roc_auc')
+
+print('LR Scores: ', lr_scores)
+print('RFC Scores: ', rfc_scores)
+
+'''
+LR Scores:  [0.80902778 0.703125   0.734375   0.80555556 0.66145833]
+RFC Scores:  [0.61284722 0.65798611 0.71614583 0.66927083 0.78125   ]
+'''
 
