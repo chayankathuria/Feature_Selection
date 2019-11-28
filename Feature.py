@@ -280,3 +280,30 @@ LR Scores:  [0.80902778 0.703125   0.734375   0.80555556 0.66145833]
 RFC Scores:  [0.61284722 0.65798611 0.71614583 0.66927083 0.78125   ]
 '''
 
+# pca keep 75% of variance
+pca = PCA(0.75)
+principal_components = pca.fit_transform(X_train)
+principal_df = pd.DataFrame(data = principal_components)
+principal_df.shape
+
+'''
+(250,93)
+'''
+
+lr = LogisticRegression(solver='liblinear')
+rfc = RandomForestClassifier(n_estimators=100)
+
+lr_scores = cross_val_score(lr, principal_df, y_train, cv=5, scoring='roc_auc')
+rfc_scores = cross_val_score(rfc, principal_df, y_train, cv=5, scoring='roc_auc')
+
+print('LR Scores: ', lr_scores)
+print('RFC Scores: ', rfc_scores)
+
+'''
+LR Scores:  [0.72048611 0.60069444 0.68402778 0.71006944 0.61284722]
+RFC Scores:  [0.48958333 0.73003472 0.64322917 0.6328125  0.67013889]
+'''
+
+'''
+From all the above techniques, RFE performed the best. Giving the best cv scores for lr and rfc.
+'''
